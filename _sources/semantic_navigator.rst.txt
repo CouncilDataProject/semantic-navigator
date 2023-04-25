@@ -1,0 +1,19 @@
+semantic\_navigator package
+===========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   semantic_navigator.app
+   semantic_navigator.bin
+
+Module contents
+---------------
+
+.. automodule:: semantic_navigator
+   :members:
+   :undoc-members:
+   :show-inheritance:

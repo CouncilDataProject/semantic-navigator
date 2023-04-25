@@ -1,0 +1,21 @@
+semantic\_navigator.bin package
+===============================
+
+Submodules
+----------
+
+semantic\_navigator.bin.semantic\_navigator module
+--------------------------------------------------
+
+.. automodule:: semantic_navigator.bin.semantic_navigator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: semantic_navigator.bin
+   :members:
+   :undoc-members:
+   :show-inheritance:

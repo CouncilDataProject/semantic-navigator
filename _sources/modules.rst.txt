@@ -1,0 +1,7 @@
+semantic_navigator
+==================
+
+.. toctree::
+   :maxdepth: 4
+
+   semantic_navigator

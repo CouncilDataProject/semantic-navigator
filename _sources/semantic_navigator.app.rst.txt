@@ -1,0 +1,21 @@
+semantic\_navigator.app package
+===============================
+
+Submodules
+----------
+
+semantic\_navigator.app.views module
+------------------------------------
+
+.. automodule:: semantic_navigator.app.views
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: semantic_navigator.app
+   :members:
+   :undoc-members:
+   :show-inheritance:
