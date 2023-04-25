@@ -9,6 +9,7 @@ Subpackages
 
    semantic_navigator.app
    semantic_navigator.bin
+   semantic_navigator.data
 
 Module contents
 ---------------

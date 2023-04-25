@@ -1,0 +1,10 @@
+semantic\_navigator.data package
+================================
+
+Module contents
+---------------
+
+.. automodule:: semantic_navigator.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
