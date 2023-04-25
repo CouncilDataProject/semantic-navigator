@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- Core Meta -->
+        <meta
+            name="title"
+            content="Semantic Navigator"
+        />
+        <meta
+            name="description"
+            content="Iteratively refine search using positive and negative examples."
+        />
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Open Graph / Facebook -->
+        <!-- <meta property="og:type" content="website" />
+        <meta
+            property="og:url"
+            content="https://paperswithoutcode.org"
+        /> -->
+        <meta
+            property="og:title"
+            content="Semantic Navigator"
+        />
+        <meta
+            property="og:description"
+            content="Iteratively refine search using positive and negative examples."
+        />
+
+        <!-- Twitter -->
+        <!-- <meta
+            property="twitter:url"
+            content="https://paperswithoutcode.org"
+        /> -->
+        <meta
+            property="twitter:title"
+            content="Semantic Navigator"
+        />
+        <meta
+            property="twitter:description"
+            content="Iteratively refine search using positive and negative examples."
+        />
+        
+        <!-- Static CSS -->
+        <link href="{{ url_for('static', filename='protocol.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='protocol-components.min.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ url_for('static', filename='loader.css') }}" rel="stylesheet" type="text/css" />
+
+        <!-- Analytics -->
+        <!-- <script defer data-domain="paperswithoutcode.org" src="https://plausible.io/js/script.js"></script> -->
+
+        <!-- Search / Process Paper JS -->
+        <script src="{{ url_for('static', filename='search-process.js') }}"></script>
+
+        <!-- Title of Page -->
+        <title>{% block title %}Semantic Navigator{% endblock %}</title>
+      </head>
+    <body>
+        <!-- Nav -->
+        <div class="mzp-c-navigation mzp-is-sticky">
+            <div class="mzp-c-navigation-l-content">
+                <div class="mzp-c-navigation-container">
+                    <button class="mzp-c-navigation-menu-button" type="button" aria-controls="navigation-demo">
+                        Menu
+                    </button>
+                    <div class="mzp-c-navigation-items" id="navigation-demo">
+                        <div class="mzp-c-navigation-menu">
+                            <nav class="mzp-c-menu mzp-is-basic">
+                                <ul class="mzp-c-menu-category-list">
+                                    <li class="mzp-c-menu-category">
+                                        <a class="mzp-c-menu-title" href="/">
+                                            Semantic Navigator
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div>
+            {% block content %} {% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="mzp-c-footer">
+            <div class="mzp-l-content" style="padding-top:48px;padding-bottom:38px">
+                <nav class="mzp-c-footer-secondary">
+                    <div class="mzp-c-footer-legal">
+                        <p class="mzp-c-footer-license">
+                            More details and information about how this website works is available on
+                            <a href="https://github.com/CouncilDataProject/semantic-navigator" target="_blank">GitHub</a>.
+                        </p>
+                    </div>
+                </nav>
+            </div>
+        </footer>
+    </body>
+</html>

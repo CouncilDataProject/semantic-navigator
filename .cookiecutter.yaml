@@ -1,0 +1,10 @@
+default_context:
+    author_name: "Eva Maxfield Brown"
+    author_email: "evamxb@uw.edu"
+    hosting_github_username_or_org: "CouncilDataProject"
+    project_name: "Semantic Navigator"
+    project_slug: "semantic-navigator"
+    python_slug: "semantic_navigator"
+    project_short_description: "An active learning approach to query and search through large archival datasets."
+    hosting_pypi_username: "CouncilDataProject"
+    license: "MIT License"
