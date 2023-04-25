@@ -88,7 +88,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["*docs/*", "*tests/*"]
+exclude = ["*docs/*", "*tests/*", "*notebooks/*"]
 
 [tool.setuptools.package-data]
 "*" = [
@@ -150,6 +150,7 @@ ignore = [
   "Justfile",
   ".cookiecutter.yaml",
   "*docs/*",
+  "*notebooks/*",
 ]
 
 [tool.mypy]
