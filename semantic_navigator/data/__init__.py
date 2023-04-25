@@ -1,8 +1,8 @@
 """Web app support package for semantic_navigator."""
 
 import shutil
-from pathlib import Path
 from logging import getLogger
+from pathlib import Path
 
 import pandas as pd
 
@@ -19,6 +19,7 @@ CDP_SEATTLE_SMALL_TEXT_FILES_ARCHIVE = (
 log = getLogger(__name__)
 
 ###############################################################################
+
 
 def load_cdp_sea_small() -> pd.DataFrame:
     # Load the dataframe at the very least
