@@ -73,6 +73,7 @@ docs = [
 dev = [
   "ipython>=8.4.0",
   "jupyterlab",
+  "umap-learn[plot]~=0.5.3",
 ]
 
 # entry points
@@ -90,7 +91,16 @@ include-package-data = true
 exclude = ["*docs/*", "*tests/*"]
 
 [tool.setuptools.package-data]
-"*" = ["*.yaml", "py.typed"]
+"*" = [
+  "*.yaml",
+  "py.typed",
+  "*.tar.gz",
+  "*.parquet",
+  "*.html",
+  "*.min.css",
+  "*.min.css.map",
+  "*.css",
+]
 
 # tools
 [tool.black]
