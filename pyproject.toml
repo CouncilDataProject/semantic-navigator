@@ -34,6 +34,7 @@ dynamic = ["version"]
 dependencies = [
   "cdp-data>=0.0.10",
   "flask~=2.2.3",
+  "gcsfs",  # no pin, pulled in from cdp-data
   "sentence-transformers~=2.2.2",
 ]
 

@@ -115,3 +115,6 @@ ENV/
 # Project specific
 cdp-datasets/
 sem-nav-cdp-sea-small-processed-chunks/
+
+# Keys
+.keys/
