@@ -34,6 +34,7 @@ dynamic = ["version"]
 dependencies = [
   "cdp-data>=0.0.10",
   "flask~=2.2.3",
+  "gcsfs",  # no pin, pulled in from cdp-data
   "sentence-transformers~=2.2.2",
 ]
 
@@ -88,7 +89,7 @@ zip-safe = false
 include-package-data = true
 
 [tool.setuptools.packages.find]
-exclude = ["*docs/*", "*tests/*", "*notebooks/*"]
+exclude = ["*docs/*", "*tests/*", "*notebooks/*", "*infra/*"]
 
 [tool.setuptools.package-data]
 "*" = [
@@ -151,6 +152,7 @@ ignore = [
   ".cookiecutter.yaml",
   "*docs/*",
   "*notebooks/*",
+  "*infra/*",
 ]
 
 [tool.mypy]
