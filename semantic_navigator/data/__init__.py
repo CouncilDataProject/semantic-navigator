@@ -216,11 +216,13 @@ def _generate_cdp_sea_dataset(
     df_rows = [row for _, row in df.iterrows()]
 
     # Process and flatten all results to a single list
-    text_chunks_results = chain(*process_map(
-        chunk_creation_func,
-        df_rows,
-        desc="Creating text chunks",
-    ))
+    text_chunks_results = chain(
+        *process_map(
+            chunk_creation_func,
+            df_rows,
+            desc="Creating text chunks",
+        )
+    )
 
     # Remove any errors
     errors = []
@@ -251,7 +253,7 @@ def _generate_cdp_sea_dataset(
     )
 
     # Combine embeddings to list of dicts
-    chunks = [
+    chunks_with_embeddings = [
         {
             **tc.to_dict(),
             "embedding": embedding,
@@ -267,10 +269,14 @@ def _generate_cdp_sea_dataset(
     )
 
     # Threaded upload
-    chunks = thread_map(text_upload_func, chunks, desc="Uploading chunks")
+    chunks_with_embeddings = thread_map(
+        text_upload_func,
+        chunks_with_embeddings,
+        desc="Uploading chunks",
+    )
 
     # Convert everything to a dataframe and store to parquet locally
-    dataset = pd.DataFrame(chunks)
+    dataset = pd.DataFrame(chunks_with_embeddings)
     dataset.to_parquet("dataset.parquet")
 
     # Store a copy of the dataset to GCS
