@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>semantic_navigator.data - semantic-navigator 0.1.dev1+gdf33027 documentation</title>
+        <title>semantic_navigator.data - semantic-navigator 0.1.dev1+g41549ce documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">semantic-navigator 0.1.dev1+gdf33027 documentation</div></a>
+      <a href="../../index.html"><div class="brand">semantic-navigator 0.1.dev1+g41549ce documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+gdf33027 documentation</span>
+  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+g41549ce documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -204,11 +204,25 @@
           <h1>Source code for semantic_navigator.data</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Web app support package for semantic_navigator.&quot;&quot;&quot;</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
 <span class="kn">from</span> <span class="nn">logging</span> <span class="kn">import</span> <span class="n">getLogger</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">cdp_backend.pipeline.transcript_model</span> <span class="kn">import</span> <span class="n">Transcript</span>
+<span class="kn">from</span> <span class="nn">dataclasses_json</span> <span class="kn">import</span> <span class="n">DataClassJsonMixin</span>
+<span class="kn">from</span> <span class="nn">gcsfs</span> <span class="kn">import</span> <span class="n">GCSFileSystem</span>
+<span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
 
 <span class="c1">###############################################################################</span>
 
@@ -233,6 +247,249 @@
     <span class="n">shutil</span><span class="o">.</span><span class="n">unpack_archive</span><span class="p">(</span><span class="n">CDP_SEATTLE_SMALL_TEXT_FILES_ARCHIVE</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">dataset</span></div>
+
+
+<div class="viewcode-block" id="TextChunkWithMeta"><a class="viewcode-back" href="../../semantic_navigator.data.html#semantic_navigator.data.TextChunkWithMeta">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TextChunkWithMeta</span><span class="p">(</span><span class="n">DataClassJsonMixin</span><span class="p">):</span>
+    <span class="n">chunk_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">event_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">session_index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">session_datetime</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">text</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+<div class="viewcode-block" id="TextChunkingError"><a class="viewcode-back" href="../../semantic_navigator.data.html#semantic_navigator.data.TextChunkingError">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TextChunkingError</span><span class="p">:</span>
+    <span class="n">event_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">session_index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">session_datetime</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">error</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+<span class="k">def</span> <span class="nf">_get_text_chunks_from_transcript</span><span class="p">(</span>
+    <span class="n">session_details_row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+    <span class="n">char_count_thresh</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TextChunkWithMeta</span><span class="p">]</span> <span class="o">|</span> <span class="n">TextChunkingError</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Read the transcript</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">transcript_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_transcript</span><span class="p">:</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">Transcript</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">open_transcript</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+        <span class="c1"># Store for all chunks</span>
+        <span class="n">completed_chunks</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Storage for the current chunk</span>
+        <span class="n">current_chunk_sentences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">current_chunk_len</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_chunk_start_time</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">sentences</span><span class="p">:</span>
+            <span class="c1"># If we have reached the max char count</span>
+            <span class="c1"># store the current chunk then reset</span>
+            <span class="k">if</span> <span class="n">current_chunk_len</span> <span class="o">&gt;=</span> <span class="n">char_count_thresh</span><span class="p">:</span>
+                <span class="c1"># Add chunk to dataset</span>
+                <span class="n">chunk_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+
+                <span class="c1"># Add all metadata to dataset</span>
+                <span class="n">completed_chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">TextChunkWithMeta</span><span class="p">(</span>
+                        <span class="n">chunk_id</span><span class="o">=</span><span class="n">chunk_id</span><span class="p">,</span>
+                        <span class="n">event_id</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">event_id</span><span class="p">,</span>
+                        <span class="n">start_time</span><span class="o">=</span><span class="n">current_chunk_start_time</span><span class="p">,</span>
+                        <span class="n">session_id</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                        <span class="n">session_index</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">session_index</span><span class="p">,</span>
+                        <span class="n">session_datetime</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">session_datetime</span><span class="p">,</span>
+                        <span class="n">text</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">current_chunk_sentences</span><span class="p">),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Reset the current chunk</span>
+                <span class="n">current_chunk_sentences</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">current_chunk_len</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># If no sentences in current chunk we are on a new chunk</span>
+            <span class="c1"># Store the start time</span>
+            <span class="k">if</span> <span class="n">current_chunk_len</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">current_chunk_start_time</span> <span class="o">=</span> <span class="n">sentence</span><span class="o">.</span><span class="n">start_time</span>
+
+            <span class="c1"># Append sentence to current list of chunk sentences</span>
+            <span class="n">current_chunk_sentences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+            <span class="n">current_chunk_len</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">completed_chunks</span>
+
+    <span class="c1"># If anything went wrong, raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">TextChunkingError</span><span class="p">(</span>
+            <span class="n">event_id</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">session_index</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">session_index</span><span class="p">,</span>
+            <span class="n">session_datetime</span><span class="o">=</span><span class="n">session_details_row</span><span class="o">.</span><span class="n">session_datetime</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_store_text_to_gcs</span><span class="p">(</span>
+    <span class="n">chunk_details</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">fs</span><span class="p">:</span> <span class="n">GCSFileSystem</span><span class="p">,</span>
+    <span class="n">ds_isolation_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">datetime</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+    <span class="c1"># Construct the complete store path</span>
+    <span class="n">chunk_store_path</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds_isolation_path</span><span class="si">}</span><span class="s2">/processed-chunks/</span><span class="si">{</span><span class="n">chunk_details</span><span class="p">[</span><span class="s1">&#39;chunk_id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">.txt&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Upload</span>
+    <span class="k">with</span> <span class="n">fs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">chunk_store_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_text</span><span class="p">:</span>
+        <span class="n">open_text</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Return completed object</span>
+    <span class="c1"># Specifically removing the text data</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;chunk_id&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;chunk_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;event_id&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;event_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;session_id&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;session_index&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;session_index&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;session_datetime&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;session_datetime&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;chunk_storage_path&quot;</span><span class="p">:</span> <span class="n">chunk_store_path</span><span class="p">,</span>
+        <span class="s2">&quot;embedding&quot;</span><span class="p">:</span> <span class="n">chunk_details</span><span class="p">[</span><span class="s2">&quot;embedding&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_generate_cdp_sea_dataset</span><span class="p">(</span>
+    <span class="n">credentials_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">n</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">char_count_thresh</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
+    <span class="n">embedding_model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;all-MiniLM-L12-v2&quot;</span><span class="p">,</span>
+    <span class="n">random_seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">12</span><span class="p">,</span>
+    <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">cdp_data</span> <span class="kn">import</span> <span class="n">CDPInstances</span><span class="p">,</span> <span class="n">datasets</span>
+    <span class="kn">from</span> <span class="nn">tqdm.contrib.concurrent</span> <span class="kn">import</span> <span class="n">process_map</span><span class="p">,</span> <span class="n">thread_map</span>
+
+    <span class="c1">###############################################################</span>
+
+    <span class="c1"># Set seeds</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+
+    <span class="c1">###############################################################</span>
+
+    <span class="c1"># Load the embedding model</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">embedding_model</span><span class="p">)</span>
+
+    <span class="c1"># Read credentials to get project</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">credentials_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
+        <span class="n">creds</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">open_f</span><span class="p">)</span>
+
+    <span class="c1"># Get project</span>
+    <span class="n">gcs_project_id</span> <span class="o">=</span> <span class="n">creds</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Create filesystem connection</span>
+    <span class="n">fs</span> <span class="o">=</span> <span class="n">GCSFileSystem</span><span class="p">(</span><span class="n">gcs_project_id</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">credentials_path</span><span class="p">))</span>
+
+    <span class="c1"># Get current datetime as a string</span>
+    <span class="c1"># which we will isolate all parts of the dataset under</span>
+    <span class="n">dt_now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+    <span class="c1"># Get dataset isolated path</span>
+    <span class="n">ds_isolation_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">gcs_project_id</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">dt_now</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># Get Seattle transcript data</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">get_session_dataset</span><span class="p">(</span>
+        <span class="n">CDPInstances</span><span class="o">.</span><span class="n">Seattle</span><span class="p">,</span>
+        <span class="n">store_transcript</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">raise_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">replace_py_objects</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Select sample</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="c1"># Create partial of chunk creation function</span>
+    <span class="n">chunk_creation_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">_get_text_chunks_from_transcript</span><span class="p">,</span>
+        <span class="n">char_count_thresh</span><span class="o">=</span><span class="n">char_count_thresh</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Get all rows as a list for parallel processing</span>
+    <span class="n">df_rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()]</span>
+
+    <span class="c1"># Process and flatten all results to a single list</span>
+    <span class="n">text_chunks_results</span> <span class="o">=</span> <span class="n">chain</span><span class="p">(</span>
+        <span class="o">*</span><span class="n">process_map</span><span class="p">(</span>
+            <span class="n">chunk_creation_func</span><span class="p">,</span>
+            <span class="n">df_rows</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Creating text chunks&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Remove any errors</span>
+    <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">text_chunk_result</span> <span class="ow">in</span> <span class="n">text_chunks_results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">text_chunk_result</span><span class="p">,</span> <span class="n">TextChunkWithMeta</span><span class="p">):</span>
+            <span class="n">chunks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_chunk_result</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_chunk_result</span><span class="p">)</span>
+
+    <span class="c1"># Log errors</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Some text chunk processing resulted in errors...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Event: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">event_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Session: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Index: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">session_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Datetime: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">session_datetime</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">ERROR: </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">40</span><span class="p">)</span>
+
+    <span class="c1"># Create embedding for all chunks</span>
+    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">tc</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">tc</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span>
+        <span class="n">show_progress_bar</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Combine embeddings to list of dicts</span>
+    <span class="n">chunks_with_embeddings</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="o">**</span><span class="n">tc</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">&quot;embedding&quot;</span><span class="p">:</span> <span class="n">embedding</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">tc</span><span class="p">,</span> <span class="n">embedding</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">chunks</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Create partial text upload function</span>
+    <span class="n">text_upload_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">_store_text_to_gcs</span><span class="p">,</span>
+        <span class="n">fs</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+        <span class="n">ds_isolation_path</span><span class="o">=</span><span class="n">ds_isolation_path</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Threaded upload</span>
+    <span class="n">chunks_with_embeddings</span> <span class="o">=</span> <span class="n">thread_map</span><span class="p">(</span>
+        <span class="n">text_upload_func</span><span class="p">,</span>
+        <span class="n">chunks_with_embeddings</span><span class="p">,</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Uploading chunks&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Convert everything to a dataframe and store to parquet locally</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">chunks_with_embeddings</span><span class="p">)</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span><span class="s2">&quot;dataset.parquet&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Store a copy of the dataset to GCS</span>
+    <span class="n">remote_dataset_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ds_isolation_path</span><span class="si">}</span><span class="s2">/dataset.parquet&quot;</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">to_parquet</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;gs://</span><span class="si">{</span><span class="n">remote_dataset_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">storage_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">credentials_path</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">remote_dataset_path</span>
 </pre></div>
         </article>
       </div>

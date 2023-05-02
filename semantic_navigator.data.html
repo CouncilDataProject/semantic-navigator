@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="semantic_navigator.bin package" href="semantic_navigator.bin.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>semantic_navigator.data package - semantic-navigator 0.1.dev1+gdf33027 documentation</title>
+        <title>semantic_navigator.data package - semantic-navigator 0.1.dev1+g41549ce documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
@@ -124,7 +124,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">semantic-navigator 0.1.dev1+gdf33027 documentation</div></a>
+      <a href="index.html"><div class="brand">semantic-navigator 0.1.dev1+g41549ce documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -147,7 +147,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+gdf33027 documentation</span>
+  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+g41549ce documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -208,6 +208,78 @@
 <section id="module-semantic_navigator.data">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-semantic_navigator.data" title="Permalink to this heading">#</a></h2>
 <p>Web app support package for semantic_navigator.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">semantic_navigator.data.</span></span><span class="sig-name descname"><span class="pre">TextChunkWithMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunk_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_datetime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'datetime'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/semantic_navigator/data.html#TextChunkWithMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">DataClassJsonMixin</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.chunk_id">
+<span class="sig-name descname"><span class="pre">chunk_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.chunk_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.event_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.session_datetime">
+<span class="sig-name descname"><span class="pre">session_datetime</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.session_datetime" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.session_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.session_index">
+<span class="sig-name descname"><span class="pre">session_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.session_index" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.start_time" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkWithMeta.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkWithMeta.text" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkingError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">semantic_navigator.data.</span></span><span class="sig-name descname"><span class="pre">TextChunkingError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_datetime</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'datetime'</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/semantic_navigator/data.html#TextChunkingError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#semantic_navigator.data.TextChunkingError" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkingError.error">
+<span class="sig-name descname"><span class="pre">error</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkingError.error" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkingError.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkingError.event_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkingError.session_datetime">
+<span class="sig-name descname"><span class="pre">session_datetime</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkingError.session_datetime" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkingError.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkingError.session_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="semantic_navigator.data.TextChunkingError.session_index">
+<span class="sig-name descname"><span class="pre">session_index</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><a class="headerlink" href="#semantic_navigator.data.TextChunkingError.session_index" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="semantic_navigator.data.load_cdp_sea_small">
 <span class="sig-prename descclassname"><span class="pre">semantic_navigator.data.</span></span><span class="sig-name descname"><span class="pre">load_cdp_sea_small</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/semantic_navigator/data.html#load_cdp_sea_small"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#semantic_navigator.data.load_cdp_sea_small" title="Permalink to this definition">#</a></dt>
@@ -273,6 +345,24 @@
             <ul>
 <li><a class="reference internal" href="#">semantic_navigator.data package</a><ul>
 <li><a class="reference internal" href="#module-semantic_navigator.data">Module contents</a><ul>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta</span></code></a><ul>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.chunk_id"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.chunk_id</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.event_id"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.event_id</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.session_datetime"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.session_datetime</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.session_id"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.session_id</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.session_index"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.session_index</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.start_time"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.start_time</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkWithMeta.text"><code class="docutils literal notranslate"><span class="pre">TextChunkWithMeta.text</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkingError"><code class="docutils literal notranslate"><span class="pre">TextChunkingError</span></code></a><ul>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkingError.error"><code class="docutils literal notranslate"><span class="pre">TextChunkingError.error</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkingError.event_id"><code class="docutils literal notranslate"><span class="pre">TextChunkingError.event_id</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkingError.session_datetime"><code class="docutils literal notranslate"><span class="pre">TextChunkingError.session_datetime</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkingError.session_id"><code class="docutils literal notranslate"><span class="pre">TextChunkingError.session_id</span></code></a></li>
+<li><a class="reference internal" href="#semantic_navigator.data.TextChunkingError.session_index"><code class="docutils literal notranslate"><span class="pre">TextChunkingError.session_index</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#semantic_navigator.data.load_cdp_sea_small"><code class="docutils literal notranslate"><span class="pre">load_cdp_sea_small()</span></code></a></li>
 </ul>
 </li>
