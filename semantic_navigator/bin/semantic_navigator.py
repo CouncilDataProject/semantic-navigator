@@ -23,23 +23,19 @@ class Args(argparse.Namespace):
 
     def __parse(self) -> None:
         p = argparse.ArgumentParser(
-            prog="pwoc-web-app",
-            description="Papers without Code: Run the web application.",
+            prog="semantic-navigator",
+            description="Semantic Navigator web app",
         )
         p.add_argument(
             "--debug",
             dest="debug",
             action="store_true",
-            help=(
-                "Run with debug logging. "
-                "Note: the web server is always ran in debug mode, this is for other "
-                "functional logging."
-            ),
+            help="Run with debug logging.",
         )
         p.parse_args(namespace=self)
 
 
-def _pwoc_app() -> None:
+def _app_main() -> None:
     # Create
     app = Flask(
         __name__,
@@ -48,10 +44,6 @@ def _pwoc_app() -> None:
 
     # Load views
     app.register_blueprint(views.views, url_prefix="/")
-
-    # Print os.environ has GITHUB_TOKEN
-    runner_has_gh_token = "GITHUB_TOKEN" in os.environ
-    log.info(f"App has access to GitHub Token: {runner_has_gh_token}")
 
     # Run (debug allows live reloading)
     app.run(debug=True, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
@@ -75,7 +67,7 @@ def main() -> None:
 
     # Manage servers
     try:
-        _pwoc_app()
+        _app_main()
     except Exception as e:
         log.error("=============================================")
         log.error("\n\n" + traceback.format_exc())

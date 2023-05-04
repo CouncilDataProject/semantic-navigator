@@ -9,7 +9,7 @@ USER := env_var("USER")
 default_region := "us-central1"
 default_key_dir := ".keys/"
 default_key := ".keys/sem-nav-dev.json"
-default_project := "sem-nav-proto"
+default_project := "cdp-sem-nav-proto"
 
 # run gcloud login
 login:
