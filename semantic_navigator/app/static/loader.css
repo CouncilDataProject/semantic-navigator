@@ -24,6 +24,11 @@
 .dot:nth-child(5) {
     animation-delay: 0.5s;
 }
+
+input {
+    width: 70%;
+}
+  
 @-moz-keyframes slide {
     0% {
         transform: scale(1);
