@@ -2,7 +2,6 @@
 
 import argparse
 import logging
-import os
 import sys
 import traceback
 
@@ -38,6 +37,7 @@ class Args(argparse.Namespace):
 def _download_model() -> None:
     # Load the embedding model
     SentenceTransformer(EMBEDDING_MODEL_NAME)
+
 
 def main() -> None:
     # Get args
