@@ -152,7 +152,7 @@ ignore = [
   "CONTRIBUTING.md",
   "Justfile",
   ".cookiecutter.yaml",
-  "*docs/*",
+  "*docs/**",
   "*notebooks/*",
   "*infra/*",
 ]
