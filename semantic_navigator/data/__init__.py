@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import random
-import shutil
 from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
@@ -20,13 +19,7 @@ from dataclasses_json import DataClassJsonMixin
 from gcsfs import GCSFileSystem
 from sentence_transformers import SentenceTransformer
 
-###############################################################################
-
-DATA_DIR = Path(__file__).resolve().parent
-CDP_SEATTLE_SMALL_DATASET = DATA_DIR / "sem-nav-cdp-sea-small.parquet"
-CDP_SEATTLE_SMALL_TEXT_FILES_ARCHIVE = (
-    DATA_DIR / "sem-nav-cdp-sea-small-processed-chunks.tar.gz"
-)
+from .. import constants
 
 ###############################################################################
 
@@ -35,18 +28,8 @@ log = getLogger(__name__)
 ###############################################################################
 
 
-def load_cdp_sea_small() -> pd.DataFrame:
-    # Load the dataframe at the very least
-    dataset = pd.read_parquet(CDP_SEATTLE_SMALL_DATASET)
-
-    # Unpack the archive
-    shutil.unpack_archive(CDP_SEATTLE_SMALL_TEXT_FILES_ARCHIVE)
-
-    return dataset
-
-
 @dataclass
-class TextChunkWithMeta(DataClassJsonMixin):
+class _TextChunkWithMeta(DataClassJsonMixin):
     chunk_id: str
     event_id: str
     start_time: float
@@ -57,7 +40,7 @@ class TextChunkWithMeta(DataClassJsonMixin):
 
 
 @dataclass
-class TextChunkingError:
+class _TextChunkingError:
     event_id: str
     session_id: str
     session_index: int
@@ -68,7 +51,7 @@ class TextChunkingError:
 def _get_text_chunks_from_transcript(
     session_details_row: pd.Series,
     char_count_thresh: int,
-) -> list[TextChunkWithMeta] | TextChunkingError:
+) -> list[_TextChunkWithMeta] | _TextChunkingError:
     try:
         # Read the transcript
         with open(session_details_row.transcript_path) as open_transcript:
@@ -90,7 +73,7 @@ def _get_text_chunks_from_transcript(
 
                 # Add all metadata to dataset
                 completed_chunks.append(
-                    TextChunkWithMeta(
+                    _TextChunkWithMeta(
                         chunk_id=chunk_id,
                         event_id=session_details_row.event_id,
                         start_time=current_chunk_start_time,
@@ -118,7 +101,7 @@ def _get_text_chunks_from_transcript(
 
     # If anything went wrong, raise
     except Exception as e:
-        return TextChunkingError(
+        return _TextChunkingError(
             event_id=session_details_row.event.id,
             session_id=session_details_row.id,
             session_index=session_details_row.session_index,
@@ -159,7 +142,7 @@ def _generate_cdp_sea_dataset(
     credentials_path: str | Path,
     n: int | None = None,
     char_count_thresh: int = 1024,
-    embedding_model: str = "all-MiniLM-L12-v2",
+    embedding_model: str = constants.EMBEDDING_MODEL_NAME,
     random_seed: int = 12,
     debug: bool = False,
 ) -> str:
@@ -228,7 +211,7 @@ def _generate_cdp_sea_dataset(
     errors = []
     chunks = []
     for text_chunk_result in text_chunks_results:
-        if isinstance(text_chunk_result, TextChunkWithMeta):
+        if isinstance(text_chunk_result, _TextChunkWithMeta):
             chunks.append(text_chunk_result)
         else:
             errors.append(text_chunk_result)
