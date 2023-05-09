@@ -11,6 +11,17 @@ Subpackages
    semantic_navigator.bin
    semantic_navigator.data
 
+Submodules
+----------
+
+semantic\_navigator.constants module
+------------------------------------
+
+.. automodule:: semantic_navigator.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

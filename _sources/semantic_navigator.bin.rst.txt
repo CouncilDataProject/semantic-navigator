@@ -4,6 +4,14 @@ semantic\_navigator.bin package
 Submodules
 ----------
 
+semantic\_navigator.bin.fetch\_model\_for\_sem\_nav module
+----------------------------------------------------------
+
+.. automodule:: semantic_navigator.bin.fetch_model_for_sem_nav
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 semantic\_navigator.bin.semantic\_navigator module
 --------------------------------------------------
 
