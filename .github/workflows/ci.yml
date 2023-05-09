@@ -117,8 +117,8 @@ jobs:
     - name: Set up Cloud SDK
       uses: google-github-actions/setup-gcloud@v1
     - name: Run Deploy
+      working-directory: infra
       run:
-        cd infra/
         just deploy 
       env:
         GITHUB_TOKEN: ${{ secrets.GH_PAT }}
