@@ -155,6 +155,7 @@ ignore = [
   "*docs/**",
   "*notebooks/*",
   "*infra/*",
+  "active-learning-example.ipynb",
 ]
 
 [tool.mypy]
