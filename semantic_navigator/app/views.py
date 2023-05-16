@@ -6,6 +6,7 @@ import pandas as pd
 from flask import (
     Blueprint,
     render_template,
+    request
 )
 from gcsfs import GCSFileSystem
 
@@ -43,15 +44,32 @@ views = Blueprint(
 
 ###############################################################################
 
-
-@views.route("/", methods=["GET"])
+@views.route("/", methods=["GET", "POST"])
 def index() -> str:
-    random_row_from_dataset = DATASET.sample(1).iloc[0]
-    with FS.open(random_row_from_dataset.chunk_storage_path, "r") as open_f:
-        example_random_text = open_f.read()
+    num_samples = 20
+    random_rows_from_dataset = DATASET.sample(num_samples).iloc[:num_samples]
+
+    texts_info = []
+    for index, row in random_rows_from_dataset.iterrows():
+        with FS.open(row.chunk_storage_path, "r") as open_f:
+            example_random_text = open_f.read()
+
+        
+        link = 'https://councildataproject.org/seattle/#/events/%s?s=%s&t=%s' % (row.event_id, row.session_index, round(row.start_time))
+
+        texts_info.append({
+            'index': index,
+            'text': example_random_text,
+            'chunk_id': row.chunk_storage_path,
+            'link': link,
+        })
+    
+
+    if request.method == 'POST':
+        output = request.get_json()
+        # TODO: Update the dataframe
 
     return render_template(
         "index.html",
-        example_random_text=example_random_text,
-        example_random_text_path=random_row_from_dataset.chunk_storage_path,
+        texts_info=texts_info,
     )

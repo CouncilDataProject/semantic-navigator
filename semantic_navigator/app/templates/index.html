@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block content %}
 <section class="mzp-c-hero" style="min-height: 82vh;">
@@ -9,13 +10,22 @@
                 <p>Iteratively refine search using positive and negative examples.</p>
             </div>
         </div>
+        <button id='train-btn' class="mzp-c-button" style="background-color: orange">Train</button>
 
         <!-- Random text variable fill -->
-        <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
-            <b>Random Example Text:</b>
-            <p>{{ example_random_text }}</p>
-            <p><em>{{ example_random_text_path }}</em></p>
+        <div id="annotation-container" class="mzp-l-sidebar-left">
+            {% for text in texts_info %}
+                <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
+                    <p>{{ text['text'] }}</p>
+                    <button id='relevant_{{ text["chunk_id"] }}' class="mzp-c-button relevant-btn" style="background-color: green">Relevant</button>
+                    <button id='irrelevant_{{ text["chunk_id"] }}' class="mzp-c-button irrelevant-btn" style="background-color: red">Irrelevant</button>
+                    <a href='{{ text["link"] }}'><button id='link-btn' class="mzp-c-button" style="background-color: blue">Link</button></a>
+                </div>
+            {% endfor %}
         </div>
+        <!-- possible classes: compact call out (no b/c headline), content container main with sidebar (for button)-->
+    
     </div>
+
 </section>
 {% endblock %}

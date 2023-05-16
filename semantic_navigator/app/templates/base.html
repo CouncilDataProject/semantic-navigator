@@ -50,13 +50,47 @@
         <!-- Analytics -->
         <!-- <script defer data-domain="paperswithoutcode.org" src="https://plausible.io/js/script.js"></script> -->
 
+        <!-- Download JQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
         <!-- Search / Process Paper JS -->
         <script src="{{ url_for('static', filename='search-process.js') }}"></script>
-
+        
         <!-- Title of Page -->
         <title>{% block title %}Semantic Navigator{% endblock %}</title>
       </head>
     <body>
+
+    <script>
+        var storage = {}
+
+        $(document).ready(function () {
+            $("#train-btn").click(function() {
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(storage),
+                    contentType: "application/json; charset=utf-8",
+                })
+            });
+
+            $(".relevant-btn").click(function() {
+                var id = $(this).attr('id')
+                var chunk_id = id.split("_")[1];
+                storage[chunk_id] = 1
+                console.log(storage)
+            });
+            
+            $(".irrelevant-btn").click(function() {
+                var id = $(this).attr('id')
+                var chunk_id = id.split("_")[1];
+                storage[chunk_id] = -1
+                console.log(storage)
+            });
+        });
+
+
+    </script>
+
         <!-- Nav -->
         <div class="mzp-c-navigation mzp-is-sticky">
             <div class="mzp-c-navigation-l-content">
