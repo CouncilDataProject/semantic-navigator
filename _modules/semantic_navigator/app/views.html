@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>semantic_navigator.app.views - semantic-navigator 0.1.dev1+gc618773 documentation</title>
+        <title>semantic_navigator.app.views - semantic-navigator 0.1.dev1+g9fd8740 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">semantic-navigator 0.1.dev1+gc618773 documentation</div></a>
+      <a href="../../../index.html"><div class="brand">semantic-navigator 0.1.dev1+g9fd8740 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+gc618773 documentation</span>
+  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+g9fd8740 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -210,6 +210,7 @@
 <span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">Blueprint</span><span class="p">,</span>
     <span class="n">render_template</span><span class="p">,</span>
+    <span class="n">request</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">gcsfs</span> <span class="kn">import</span> <span class="n">GCSFileSystem</span>
 
@@ -247,17 +248,34 @@
 
 <span class="c1">###############################################################################</span>
 
-
-<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.index">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.index">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">random_row_from_dataset</span> <span class="o">=</span> <span class="n">DATASET</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">with</span> <span class="n">FS</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">random_row_from_dataset</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
-        <span class="n">example_random_text</span> <span class="o">=</span> <span class="n">open_f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">random_rows_from_dataset</span> <span class="o">=</span> <span class="n">DATASET</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">num_samples</span><span class="p">]</span>
+
+    <span class="n">texts_info</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">random_rows_from_dataset</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">FS</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
+            <span class="n">example_random_text</span> <span class="o">=</span> <span class="n">open_f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        
+        <span class="n">link</span> <span class="o">=</span> <span class="s1">&#39;https://councildataproject.org/seattle/#/events/</span><span class="si">%s</span><span class="s1">?s=</span><span class="si">%s</span><span class="s1">&amp;t=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">event_id</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">session_index</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">start_time</span><span class="p">))</span>
+
+        <span class="n">texts_info</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+            <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="n">index</span><span class="p">,</span>
+            <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">example_random_text</span><span class="p">,</span>
+            <span class="s1">&#39;chunk_id&#39;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">chunk_id</span><span class="p">,</span>
+            <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">link</span><span class="p">,</span>
+            <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">session_datetime</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="p">})</span>
+    
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+        <span class="c1"># TODO: Update the dataframe</span>
 
     <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
         <span class="s2">&quot;index.html&quot;</span><span class="p">,</span>
-        <span class="n">example_random_text</span><span class="o">=</span><span class="n">example_random_text</span><span class="p">,</span>
-        <span class="n">example_random_text_path</span><span class="o">=</span><span class="n">random_row_from_dataset</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span>
+        <span class="n">texts_info</span><span class="o">=</span><span class="n">texts_info</span><span class="p">,</span>
     <span class="p">)</span></div>
 </pre></div>
         </article>
