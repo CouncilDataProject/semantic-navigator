@@ -22,6 +22,22 @@ semantic\_navigator.constants module
    :undoc-members:
    :show-inheritance:
 
+semantic\_navigator.query\_embedding module
+-------------------------------------------
+
+.. automodule:: semantic_navigator.query_embedding
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+semantic\_navigator.train module
+--------------------------------
+
+.. automodule:: semantic_navigator.train
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
