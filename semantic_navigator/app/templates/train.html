@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="mzp-c-hero" style="min-height: 82vh;">
+    <div class="mzp-l-content mzp-t-content-lg">
+        <!-- Basic intro -->
+        <h1 class="mzp-c-hero-title">Semantic Navigator</h1>
+        <div class="mzp-c-hero-body">
+            <div class="mzp-c-hero-desc">
+                <p>Iteratively refine search using positive and negative examples.</p>
+            </div>
+        </div>
+
+        <!-- Search bar -->
+        <form>
+            <div class="input-group">
+              <input
+                type="search"
+                placeholder="Search for a topic…" />
+              <button class="mzp-c-button" type="button">Search</button>
+            </div>
+        </form>
+
+        <!-- Random text variable fill -->
+        <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
+            <b>Random Example Text:</b>
+            <p>{{ example_random_text }}</p>
+            <p><em>{{ example_random_text_path }}</em></p>
+            <p><em>{{ example_random_text_session }}</em></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
