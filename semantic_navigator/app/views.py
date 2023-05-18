@@ -46,22 +46,22 @@ views = Blueprint(
 
 @views.route("/", methods=["GET", "POST"])
 def index() -> str:
-    num_samples = 20
+    num_samples = 5
     random_rows_from_dataset = DATASET.sample(num_samples).iloc[:num_samples]
 
     texts_info = []
     for index, row in random_rows_from_dataset.iterrows():
         with FS.open(row.chunk_storage_path, "r") as open_f:
             example_random_text = open_f.read()
-
         
         link = 'https://councildataproject.org/seattle/#/events/%s?s=%s&t=%s' % (row.event_id, row.session_index, round(row.start_time))
 
         texts_info.append({
             'index': index,
             'text': example_random_text,
-            'chunk_id': row.chunk_storage_path,
+            'chunk_id': row.chunk_id,
             'link': link,
+            'date': row.session_datetime.date()
         })
     
 

@@ -2,24 +2,34 @@
 {% extends "base.html" %}
 {% block content %}
 <section class="mzp-c-hero" style="min-height: 82vh;">
+
     <div class="mzp-l-content mzp-t-content-lg">
-        <!-- Basic intro -->
-        <h1 class="mzp-c-hero-title">Semantic Navigator</h1>
-        <div class="mzp-c-hero-body">
-            <div class="mzp-c-hero-desc">
-                <p>Iteratively refine search using positive and negative examples.</p>
+
+        <div  style="position: -webkit-sticky; position: sticky; top: 0; background-color: white; border: 20px solid white" > 
+
+            <!-- Basic intro -->
+            <h1 class="mzp-c-hero-title">Semantic Navigator</h1>
+            <div class="mzp-c-hero-body" >
+                <div class="mzp-c-hero-desc">
+                    <p>Iteratively refine search using positive and negative examples.</p>
+                </div>
             </div>
+            <button id='train-btn' class="mzp-c-button mzp-t-lg" value='testvalue' style="background-color: #fdbf6f; border-color:#B38E62">Train</button>
         </div>
-        <button id='train-btn' class="mzp-c-button" style="background-color: orange">Train</button>
+        
 
         <!-- Random text variable fill -->
         <div id="annotation-container" class="mzp-l-sidebar-left">
             {% for text in texts_info %}
                 <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
+                    <div style="display:inline-block">  
+                        <h4>{{ text['date'] }}</h4>
+                        <a href='{{ text["link"] }}' target="_blank"><button id='link-btn' class="mzp-c-button mzp-t-sm" style="background-color: #a6cee3; border-color:#7198AC">Link</button></a>
+                    </div>  
+                    <br></br>
                     <p>{{ text['text'] }}</p>
-                    <button id='relevant_{{ text["chunk_id"] }}' class="mzp-c-button relevant-btn" style="background-color: green">Relevant</button>
-                    <button id='irrelevant_{{ text["chunk_id"] }}' class="mzp-c-button irrelevant-btn" style="background-color: red">Irrelevant</button>
-                    <a href='{{ text["link"] }}'><button id='link-btn' class="mzp-c-button" style="background-color: blue">Link</button></a>
+                    <button id='relevant_{{ text["chunk_id"] }}' class="mzp-c-button relevant-btn" style="background-color: #b2df8a; border-color:#7CA857" value="unclicked">Relevant</button>
+                    <button id='irrelevant_{{ text["chunk_id"] }}' class="mzp-c-button irrelevant-btn" style="background-color: #fb9a99; border-color:#C06566" value="unclicked">Irrelevant</button>
                 </div>
             {% endfor %}
         </div>

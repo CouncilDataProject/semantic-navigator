@@ -74,12 +74,32 @@
             });
 
             $(".relevant-btn").click(function() {
-                var id = $(this).attr('id')
+
+                var id = $(this).attr('id');
                 var chunk_id = id.split("_")[1];
-                storage[chunk_id] = 1
-                console.log(storage)
+                var irrelevant_button = 'irrelevant_' + chunk_id
+                console.log(irrelevant_button)
+
+                if ($(this).val() == 'unclicked') {
+                    // change values
+                    console.log("UNCLICKED")
+                    console.log($(this).val())
+                    console.log($(`button[id="${irrelevant_button}"]`).val())
+                    $(this).val('clicked') 
+
+                    // change css
+
+                    // change storage
+                }
+                else if ($(this).val() == 'clicked') {
+                    console.log("UNCLICKED")
+                }
+                storage[chunk_id] = 1;
+                console.log(storage);
+                // will need to have value attached to button
+                $(this).css({ 'color': 'red', 'font-size': '150%' });
             });
-            
+
             $(".irrelevant-btn").click(function() {
                 var id = $(this).attr('id')
                 var chunk_id = id.split("_")[1];
