@@ -9,7 +9,7 @@ USER := env_var("USER")
 default_region := "us-central1"
 default_key_dir := ".keys/"
 default_key := ".keys/sem-nav-dev.json"
-default_project := "cdp-sem-nav-proto"
+default_project := "sem-nav-eva-005"
 
 # run gcloud login
 login:
@@ -60,8 +60,22 @@ deploy project=default_project region=default_region:
     -gsutil mb gs://{{project}}
     gsutil cors set cors.json gs://{{project}}
     gsutil defacl ch -u AllUsers:R gs://{{project}}
+    gcloud builds submit --tag gcr.io/{{project}}/semanticnavigator
+    gcloud run deploy semanticnavigator \
+        --image gcr.io/{{project}}/semanticnavigator \
+        --region {{region}} \
+        --allow-unauthenticated \
+        --memory 4Gi
 
 # fully teardown project
 destroy project:
     gcloud projects delete {{project}}
     rm -f {{default_key_dir}}{{project}}.json
+
+# build docker image locally
+build-docker:
+	docker build --tag semantic-navigator {{justfile_directory()}}
+
+# run docker image locally
+run-docker:
+	docker run --rm -p 9090:8080 -e PORT=8080 semantic-navigator
