@@ -54,7 +54,7 @@ def index() -> str:
         example_random_text = open_f.read()
 
     #if request.method == "POST":
-        
+         # TODO: parse search query
 
     return render_template(
         "index.html",
@@ -68,8 +68,7 @@ def train() -> str:
     # generate best guesses based on search query
     num_samples = 20
 
-    # TODO: parse search query
-
+    # query will come from index (landing page)
     first_20_results = query_results(query, num_samples, DATASET)
 
     # formatting to get necessary attributes for displaying
