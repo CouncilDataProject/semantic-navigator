@@ -50,13 +50,67 @@
         <!-- Analytics -->
         <!-- <script defer data-domain="paperswithoutcode.org" src="https://plausible.io/js/script.js"></script> -->
 
+        <!-- Download JQuery -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
         <!-- Search / Process Paper JS -->
         <script src="{{ url_for('static', filename='search-process.js') }}"></script>
-
+        
         <!-- Title of Page -->
         <title>{% block title %}Semantic Navigator{% endblock %}</title>
       </head>
     <body>
+
+    <script>
+        var storage = {}
+
+        $(document).ready(function () {
+            $("#train-btn").click(function() {
+                $.ajax({
+                    type: "POST",
+                    data: JSON.stringify(storage),
+                    contentType: "application/json; charset=utf-8",
+                })
+            });
+
+            $(".relevant-btn").click(function() {
+
+                var id = $(this).attr('id');
+                var chunk_id = id.split("_")[1];
+                var irrelevant_button = 'irrelevant_' + chunk_id
+                console.log(irrelevant_button)
+
+                if ($(this).val() == 'unclicked') {
+                    // change values
+                    console.log("UNCLICKED")
+                    console.log($(this).val())
+                    console.log($(`button[id="${irrelevant_button}"]`).val())
+                    $(this).val('clicked') 
+
+                    // change css
+
+                    // change storage
+                }
+                else if ($(this).val() == 'clicked') {
+                    console.log("UNCLICKED")
+                }
+                storage[chunk_id] = 1;
+                console.log(storage);
+                // will need to have value attached to button
+                $(this).css({ 'color': 'red', 'font-size': '150%' });
+            });
+
+            $(".irrelevant-btn").click(function() {
+                var id = $(this).attr('id')
+                var chunk_id = id.split("_")[1];
+                storage[chunk_id] = -1
+                console.log(storage)
+            });
+        });
+
+
+    </script>
+
         <!-- Nav -->
         <div class="mzp-c-navigation mzp-is-sticky">
             <div class="mzp-c-navigation-l-content">

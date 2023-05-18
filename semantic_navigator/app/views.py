@@ -46,7 +46,6 @@ views = Blueprint(
 
 ###############################################################################
 
-
 @views.route("/", methods=["GET","POST"])
 def index() -> str:
     random_row_from_dataset = DATASET.sample(1).iloc[0]

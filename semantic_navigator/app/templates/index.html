@@ -1,14 +1,22 @@
+
 {% extends "base.html" %}
 {% block content %}
 <section class="mzp-c-hero" style="min-height: 82vh;">
+
     <div class="mzp-l-content mzp-t-content-lg">
-        <!-- Basic intro -->
-        <h1 class="mzp-c-hero-title">Semantic Navigator</h1>
-        <div class="mzp-c-hero-body">
-            <div class="mzp-c-hero-desc">
-                <p>Iteratively refine search using positive and negative examples.</p>
+
+        <div  style="position: -webkit-sticky; position: sticky; top: 0; background-color: white; border: 20px solid white" > 
+
+            <!-- Basic intro -->
+            <h1 class="mzp-c-hero-title">Semantic Navigator</h1>
+            <div class="mzp-c-hero-body" >
+                <div class="mzp-c-hero-desc">
+                    <p>Iteratively refine search using positive and negative examples.</p>
+                </div>
             </div>
+            <button id='train-btn' class="mzp-c-button mzp-t-lg" value='testvalue' style="background-color: #fdbf6f; border-color:#B38E62">Train</button>
         </div>
+        
 
         <!-- Search bar -->
         <form>
@@ -32,6 +40,9 @@
             <p><em>{{ example_random_text_path }}</em></p>
             <p><em>{{ example_random_text_session }}</em></p>
         </div>
+        <!-- possible classes: compact call out (no b/c headline), content container main with sidebar (for button)-->
+    
     </div>
+
 </section>
 {% endblock %}
