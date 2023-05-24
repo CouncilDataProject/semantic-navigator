@@ -16,29 +16,40 @@
             </div>
         </div>
         
-        <!-- Search bar -->
-        <form action="/train" method="post">
+        <!-- Search bar 
+        <form id='search_bar' method="POST">
             <div class="input-group">
               <input
+                id="search-value"
                 type="search"
                 placeholder="Search for a topic…" />
             </div>
-        </form>
+        </form>-->
+
+
+        <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
+            <form class="mzp-c-form" style="margin-bottom: 0;" method="POST">
+                <label class="mzp-c-hero-tagline" for="search">Search
+                    <span class="mzp-c-fieldnote" style="margin-top: 20px;">
+                        Provide a DOI, SemanticScholarID, CorpusID, ArXivID, ACL, or URL from <a href="https://semanticscholar.org" target="_blank">semanticscholar.org</a>, <a href="https://arxiv.org" target="_blank">arxiv.org</a>, <a href="https://aclweb.org" target="_blank">aclweb.org</a>, <a href="https://acm.org" target="_blank">acm.org</a>, or <a href="https://biorxiv.org" target="_blank">biorxiv.org</a>. DOIs can be provided as is. All other IDs should be given with their type, for example: <a href="https://doi.org/10.18653/v1/2020.acl-main.447 "><em>doi:10.18653/v1/2020.acl-main.447 </em></a> or <a href="https://api.semanticscholar.org/CorpusID:202558505"><em>corpusid:202558505</em></a> or <a href="https://arxiv.org/abs/2004.07180"><em>url:https://arxiv.org/abs/2004.07180</em></a>.
+                    </span>
+                </label>
+                <input
+                    style="width:100vw;margin-top: 20px;"
+                    type="search"
+                    id="search"
+                    required
+                    name="search"
+                    placeholder="doi:10.18653/v1/2020.acl-main.447 or corpusid:202558505, etc."
+                />
+                <button class="mzp-c-button" type="submit">Submit</button>
+            </form>
+        </div>
 
         <!-- Video placeholder -->
         <iframe width="640" height="360" 
             src="https://www.youtube.com/embed/zVRwUHbHgt8">
         </iframe>
-
-        <!-- Random text variable fill -->
-        <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
-            <b>Random Example Text:</b>
-            <p>{{ example_random_text }}</p>
-            <p><em>{{ example_random_text_path }}</em></p>
-            <p><em>{{ example_random_text_session }}</em></p>
-        </div>
-        <!-- possible classes: compact call out (no b/c headline), content container main with sidebar (for button)-->
-    
     </div>
 
 </section>

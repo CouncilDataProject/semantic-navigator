@@ -64,102 +64,47 @@
     <script>
         var storage = {}
 
-        const clicked = 'clicked'
-        const unclicked = 'unclicked'
-
         $(document).ready(function () {
-            // $("#search_bar").on("submit", function() {
-            //     console.log("SUBMITTING")
-            //     $.ajax({
-            //         type: "POST",
-            //         data: JSON.stringify({'query': 'television'}),
-            //         contentType: "application/json; charset=utf-8",
-            //     })
-            // });
-
             $("#train-btn").click(function() {
                 $.ajax({
                     type: "POST",
                     data: JSON.stringify(storage),
                     contentType: "application/json; charset=utf-8",
-                }).done(function(data) {
-                    console.log(data);
-                    all_texts = document.querySelectorAll('.council-text')
-                    // Update ID of text
-                    all_texts.forEach((i) => $(`p[id="${'council-text_' + i['chunk_id']}"]`).setValue(i['text']))
-
-                    // Update text
-                    data.forEach((i) => $(`p[id="${'council-text_' + i['chunk_id']}"]`).setValue(i['text']))
                 })
             });
 
             $(".relevant-btn").click(function() {
-                // Always make sure other button unclicked
+
                 var id = $(this).attr('id');
                 var chunk_id = id.split("_")[1];
                 var irrelevant_button = 'irrelevant_' + chunk_id
-                $(`button[id="${irrelevant_button}"]`).val(unclicked);
-                $(`button[id="${irrelevant_button}"]`).css({ 'background-color': '#fb9a99'});
+                console.log(irrelevant_button)
 
-                if ($(this).val() == unclicked) {
+                if ($(this).val() == 'unclicked') {
                     // change values
-                    $(this).val(clicked)
+                    console.log("UNCLICKED")
+                    console.log($(this).val())
+                    console.log($(`button[id="${irrelevant_button}"]`).val())
+                    $(this).val('clicked') 
 
                     // change css
-                    $(this).css({ 'background-color': '#7CA857'});
 
-                    // change storage -- for if already clicked, then delete
-                    storage[chunk_id] = 1;
+                    // change storage
                 }
-                else if ($(this).val() == clicked) {
-                    // change values
-                    // change values
-                    $(this).val(unclicked)
-
-                    // change css
-                    $(this).css({ 'background-color': '#b2df8a'});
-
-                    // change storage -- for if already clicked, then delete
-                    delete storage[chunk_id];
+                else if ($(this).val() == 'clicked') {
+                    console.log("UNCLICKED")
                 }
-
-                // Change storage
+                storage[chunk_id] = 1;
                 console.log(storage);
-                
+                // will need to have value attached to button
+                $(this).css({ 'color': 'red', 'font-size': '150%' });
             });
 
             $(".irrelevant-btn").click(function() {
-                // Always make sure other button unclicked
-                var id = $(this).attr('id');
+                var id = $(this).attr('id')
                 var chunk_id = id.split("_")[1];
-                var relevant_button = 'relevant_' + chunk_id
-                $(`button[id="${relevant_button}"]`).val(unclicked);
-                $(`button[id="${relevant_button}"]`).css({ 'background-color': '#b2df8a'});
-
-                if ($(this).val() == unclicked) {
-                    // change values
-                    $(this).val(clicked)
-
-                    // change css
-                    $(this).css({ 'background-color': '#C06566'});
-
-                    // change storage -- for if already clicked, then delete
-                    storage[chunk_id] = -1;
-                }
-                else if ($(this).val() == clicked) {
-                    // change values
-                    // change values
-                    $(this).val(unclicked)
-
-                    // change css
-                    $(this).css({ 'background-color': '#fb9a99'});
-
-                    // change storage -- for if already clicked, then delete
-                    delete storage[chunk_id];
-                }
-
-                // Change storage
-                console.log(storage);
+                storage[chunk_id] = -1
+                console.log(storage)
             });
         });
 
@@ -179,7 +124,7 @@
                                 <ul class="mzp-c-menu-category-list">
                                     <li class="mzp-c-menu-category">
                                         <a class="mzp-c-menu-title" href="/">
-                                            Semantic Navigator
+                                            Semantic Navigator ON THE TRAIN FILE WOO
                                         </a>
                                     </li>
                                 </ul>
@@ -193,7 +138,7 @@
 
         <!-- Main Content -->
         <div>
-            {% block content %} {% endblock %}
+            {% block train-content %} {% endblock %}
         </div>
 
         <!-- Footer -->

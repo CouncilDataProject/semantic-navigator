@@ -22,6 +22,7 @@ def update_dataset(positives: list, negatives: list, DATASET: pd.DataFrame) -> p
     n_negative_examples = 400
 
     # using the stored chunk ids, pull the positive embeddings
+    print(positives)
     positive_embeddings = np.stack(DATASET.loc[DATASET.chunk_id.isin(positives)].embedding)
 
     # using the stored chunk ids, pull the negative embeddings
