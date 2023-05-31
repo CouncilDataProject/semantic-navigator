@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="mzp-c-hero" style="min-height: 82vh;">
+
+    <div class="mzp-l-content mzp-t-content-lg">
+        <h1 class="mzp-c-hero-title">All Results</h1>
+        <div class="mzp-c-hero-body" >
+            <p>Results include both labeled as "Relevant" and predicted as "Relevant".</p>
+        </div>
+
+        <!-- Text samples -->
+        <div id="annotation-container" class="mzp-l-sidebar-left">
+            {% for text in texts_info %}
+                <div class="mzp-c-emphasis-box" style="text-align: left;margin-top: 10vh;margin-bottom: 10vh;">
+                    <div style="display:inline-block">  
+                        <h4>{{ text["date"] }}</h4>
+                        <a
+                            href="{{ text['link'] }}""
+                            target="_blank"
+                        >
+                            <button
+                                class="mzp-c-button mzp-t-sm"
+                                style="background-color: #a6cee3; border-color:#7198AC"
+                            >
+                                View on CDP Event Page
+                            </button>
+                        </a>
+                    </div>  
+                    <br></br>
+                    <p>{{ text["text"] }}</p>
+                    <em>Predicted probability: {{ text["proba"] }}</em>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock %}
