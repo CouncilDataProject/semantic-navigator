@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>semantic_navigator.query_embedding - semantic-navigator 0.1.dev1+g510208e documentation</title>
+        <title>semantic_navigator.query_embedding - semantic-navigator 0.1.dev1+gc39751d documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">semantic-navigator 0.1.dev1+g510208e documentation</div></a>
+      <a href="../../index.html"><div class="brand">semantic-navigator 0.1.dev1+gc39751d documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+g510208e documentation</span>
+  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+gc39751d documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -202,25 +202,33 @@
         </div>
         <article role="main">
           <h1>Source code for semantic_navigator.query_embedding</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
-<span class="kn">from</span> <span class="nn">semantic_navigator.constants</span> <span class="kn">import</span> <span class="n">EMBEDDING_MODEL_NAME</span>
 <span class="kn">from</span> <span class="nn">sentence_transformers.util</span> <span class="kn">import</span> <span class="n">cos_sim</span>
 
-<div class="viewcode-block" id="query_results"><a class="viewcode-back" href="../../semantic_navigator.html#semantic_navigator.query_embedding.query_results">[docs]</a><span class="k">def</span> <span class="nf">query_results</span><span class="p">(</span><span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">DATASET</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-    <span class="c1"># load the embedding model</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">EMBEDDING_MODEL_NAME</span><span class="p">)</span>
+<span class="c1">###############################################################################</span>
 
+
+<div class="viewcode-block" id="query_results"><a class="viewcode-back" href="../../semantic_navigator.html#semantic_navigator.query_embedding.query_results">[docs]</a><span class="k">def</span> <span class="nf">query_results</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">SentenceTransformer</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="c1"># embed the query</span>
     <span class="n">query_embedding</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
-    
-    <span class="c1"># get similarity of query against all docs</span>
-    <span class="n">DATASET</span><span class="p">[</span><span class="s2">&quot;similarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">DATASET</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">cos_sim</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">query_embedding</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
 
-    <span class="c1"># get top 20 most similar text chunks</span>
-    <span class="n">first_20_results</span> <span class="o">=</span> <span class="n">DATASET</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s2">&quot;similarity&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)[:</span><span class="n">num_samples</span><span class="p">]</span>
-    
-    <span class="k">return</span> <span class="n">first_20_results</span></div>
+    <span class="c1"># get similarity of query against all docs</span>
+    <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;similarity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">embedding</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+        <span class="k">lambda</span> <span class="n">e</span><span class="p">:</span> <span class="n">cos_sim</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">query_embedding</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="p">)</span>
+
+    <span class="c1"># get top n samples</span>
+    <span class="n">first_n_samples</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+        <span class="n">by</span><span class="o">=</span><span class="s2">&quot;similarity&quot;</span><span class="p">,</span>
+        <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)[:</span><span class="n">num_samples</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">first_n_samples</span></div>
 </pre></div>
         </article>
       </div>

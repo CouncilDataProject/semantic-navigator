@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>semantic_navigator.app.views - semantic-navigator 0.1.dev1+g510208e documentation</title>
+        <title>semantic_navigator.app.views - semantic-navigator 0.1.dev1+gc39751d documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../../index.html"><div class="brand">semantic-navigator 0.1.dev1+g510208e documentation</div></a>
+      <a href="../../../index.html"><div class="brand">semantic-navigator 0.1.dev1+gc39751d documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../index.html">
   
   
-  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+g510208e documentation</span>
+  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+gc39751d documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -205,18 +205,16 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Blueprint</span><span class="p">,</span>
-    <span class="n">render_template</span><span class="p">,</span>
-    <span class="n">request</span><span class="p">,</span>
-    <span class="n">redirect</span><span class="p">,</span>
-    <span class="n">url_for</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Blueprint</span><span class="p">,</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">url_for</span>
 <span class="kn">from</span> <span class="nn">gcsfs</span> <span class="kn">import</span> <span class="n">GCSFileSystem</span>
-<span class="kn">from</span> <span class="nn">semantic_navigator.train</span> <span class="kn">import</span> <span class="n">sort_annotations</span><span class="p">,</span> <span class="n">update_dataset</span>
+<span class="kn">from</span> <span class="nn">sentence_transformers</span> <span class="kn">import</span> <span class="n">SentenceTransformer</span>
+
+<span class="kn">from</span> <span class="nn">semantic_navigator.constants</span> <span class="kn">import</span> <span class="n">EMBEDDING_MODEL_NAME</span>
 <span class="kn">from</span> <span class="nn">semantic_navigator.query_embedding</span> <span class="kn">import</span> <span class="n">query_results</span>
+<span class="kn">from</span> <span class="nn">semantic_navigator.train</span> <span class="kn">import</span> <span class="n">get_final_dataset</span><span class="p">,</span> <span class="n">sort_annotations</span><span class="p">,</span> <span class="n">update_dataset</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">TEMPLATES_DIR</span>
 
@@ -241,10 +239,13 @@
     <span class="n">storage_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="s2">&quot;anon&quot;</span><span class="p">},</span>
 <span class="p">)</span>
 
-<span class="c1"># THis will change</span>
-<span class="k">global</span> <span class="n">QUERY</span> 
-<span class="n">QUERY</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="c1"># QUERY = &#39;housing crisis&#39;</span>
+<span class="c1"># load the embedding model</span>
+<span class="n">EMBEDDING_MODEL</span> <span class="o">=</span> <span class="n">SentenceTransformer</span><span class="p">(</span><span class="n">EMBEDDING_MODEL_NAME</span><span class="p">)</span>
+
+<span class="c1"># Store global positives and negatives history</span>
+<span class="n">POSITIVES</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">NEGATIVES</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
 <span class="c1">###############################################################################</span>
 <span class="c1"># Flask routing</span>
 
@@ -257,110 +258,94 @@
 <span class="c1">###############################################################################</span>
 
 
+<span class="k">def</span> <span class="nf">_create_text_infos</span><span class="p">(</span><span class="n">dataset</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">with_proba</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="n">texts_info</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="k">with</span> <span class="n">FS</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
+            <span class="n">text_selection</span> <span class="o">=</span> <span class="n">open_f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+        <span class="n">link</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;https://councildataproject.org/seattle/&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;#/events/</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">event_id</span><span class="si">}</span><span class="s2">?s=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">session_index</span><span class="si">}</span><span class="s2">&amp;t=</span><span class="si">{</span><span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="n">index</span><span class="p">,</span>
+            <span class="s2">&quot;date&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">session_datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span>
+            <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text_selection</span><span class="p">,</span>
+            <span class="s2">&quot;chunk_id&quot;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">chunk_id</span><span class="p">,</span>
+            <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="n">link</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Add optional probability</span>
+        <span class="k">if</span> <span class="n">with_proba</span><span class="p">:</span>
+            <span class="n">info</span><span class="p">[</span><span class="s2">&quot;proba&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">prob</span>
+
+        <span class="n">texts_info</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">texts_info</span>
 
 
-
-
-<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.index">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+<div class="viewcode-block" id="index"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.index">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">index</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">random_row_from_dataset</span> <span class="o">=</span> <span class="n">DATASET</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="k">with</span> <span class="n">FS</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">random_row_from_dataset</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
-        <span class="n">example_random_text</span> <span class="o">=</span> <span class="n">open_f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
+    <span class="c1"># Handle search</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
         <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span>
             <span class="n">url_for</span><span class="p">(</span>
                 <span class="s2">&quot;views.train&quot;</span><span class="p">,</span>
                 <span class="n">q</span><span class="o">=</span><span class="n">query</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="c1"># print(&quot;POSTING&quot;)</span>
-        <span class="c1"># output = request.get_json()</span>
-        <span class="c1"># print(&quot;IN POST!&quot;, output)</span>
-        <span class="c1"># # TODO: parse search query</span>
-        <span class="c1"># global QUERY</span>
-        <span class="c1"># QUERY = output[&#39;query&#39;]</span>
-        <span class="c1"># print(&#39;query: &#39;, QUERY)</span>
-        <span class="c1"># print(&#39;URLE FOR&#39;, url_for(&#39;views.train&#39;))</span>
-        <span class="c1"># #return redirect(url_for(&#39;views.train&#39;))</span>
-        <span class="c1"># # print(&#39;URLE FOR&#39;, url_for(&#39;views.train&#39;))</span>
-        <span class="c1"># return redirect(&quot;/train&quot;)</span>
 
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RENDERING INDEX&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
-        <span class="s2">&quot;index.html&quot;</span><span class="p">,</span>
-        <span class="n">example_random_text</span><span class="o">=</span><span class="n">example_random_text</span><span class="p">,</span>
-        <span class="n">example_random_text_path</span><span class="o">=</span><span class="n">random_row_from_dataset</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span>
-        <span class="n">example_random_text_session</span><span class="o">=</span><span class="n">random_row_from_dataset</span><span class="o">.</span><span class="n">session_datetime</span>
-    <span class="p">)</span></div>
+    <span class="c1"># Handle landing page</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;index.html&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="train"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.train">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/train/&lt;q&gt;&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span><span class="s2">&quot;POST&quot;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="train"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.train">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/train/&lt;q&gt;&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">])</span>
 <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">q</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;INTRAIN WOOOOOO, &quot;</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span>
-    <span class="c1"># If the request was not sent a json (for initial search)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;NO DAT WOO&quot;</span><span class="p">)</span>
-        <span class="c1"># generate best guesses based on search query</span>
-        <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">20</span>
-        <span class="c1"># # query will come from index (landing page)</span>
-        <span class="n">first_20_results</span> <span class="o">=</span> <span class="n">query_results</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">,</span> <span class="n">DATASET</span><span class="p">)</span>
+    <span class="c1"># Import global storage</span>
+    <span class="k">global</span> <span class="n">POSITIVES</span>
+    <span class="k">global</span> <span class="n">NEGATIVES</span>
+
+    <span class="c1"># If we were rerouted here from index</span>
+    <span class="c1"># Load with query similarity</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+        <span class="c1"># query will come from index (landing page)</span>
+        <span class="n">first_20_results</span> <span class="o">=</span> <span class="n">query_results</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="n">DATASET</span><span class="p">,</span> <span class="n">EMBEDDING_MODEL</span><span class="p">)</span>
 
         <span class="c1"># formatting to get necessary attributes for displaying</span>
-        <span class="n">texts_info</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">first_20_results</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="k">with</span> <span class="n">FS</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
-                <span class="n">example_random_text</span> <span class="o">=</span> <span class="n">open_f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-            
-            <span class="n">link</span> <span class="o">=</span> <span class="s1">&#39;https://councildataproject.org/seattle/#/events/</span><span class="si">%s</span><span class="s1">?s=</span><span class="si">%s</span><span class="s1">&amp;t=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">event_id</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">session_index</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">start_time</span><span class="p">))</span>
-            <span class="n">texts_info</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="n">index</span><span class="p">,</span>
-                <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">session_datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span>
-                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">example_random_text</span><span class="p">,</span>
-                <span class="s1">&#39;chunk_id&#39;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">chunk_id</span><span class="p">,</span>
-                <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">link</span><span class="p">,</span>
-            <span class="p">})</span>
-    
-    <span class="c1"># update results based on user&#39;s annotations</span>
-    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_json</span><span class="p">()</span>
+        <span class="n">text_infos</span> <span class="o">=</span> <span class="n">_create_text_infos</span><span class="p">(</span><span class="n">first_20_results</span><span class="p">)</span>
 
+    <span class="c1"># If we were routed here from clicking the train button / post</span>
+    <span class="c1"># Get new annotations, update global annotations, train model, render new</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
         <span class="c1"># get positives and negatives from user&#39;s annotations</span>
-        <span class="n">positives</span><span class="p">,</span> <span class="n">negatives</span> <span class="o">=</span> <span class="n">sort_annotations</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">batch_positives</span><span class="p">,</span> <span class="n">batch_negatives</span> <span class="o">=</span> <span class="n">sort_annotations</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">form</span><span class="p">)</span>
 
-        <span class="c1"># update dataframe</span>
-        <span class="n">next_20_best_samples</span> <span class="o">=</span> <span class="n">update_dataset</span><span class="p">(</span><span class="n">positives</span><span class="p">,</span> <span class="n">negatives</span><span class="p">,</span> <span class="n">DATASET</span><span class="p">)</span>
+        <span class="c1"># Update global storage</span>
+        <span class="n">POSITIVES</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="o">*</span><span class="n">POSITIVES</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">batch_positives</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">NEGATIVES</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="o">*</span><span class="n">NEGATIVES</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">batch_negatives</span><span class="p">,</span>
+        <span class="p">]</span>
 
-        <span class="c1"># matching format to texts_info</span>
-        <span class="n">texts_info</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">next_20_best_samples</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
-            <span class="k">with</span> <span class="n">FS</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">chunk_storage_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">open_f</span><span class="p">:</span>
-                <span class="n">transcript</span> <span class="o">=</span> <span class="n">open_f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        
-            <span class="n">link</span> <span class="o">=</span> <span class="s1">&#39;https://councildataproject.org/seattle/#/events/</span><span class="si">%s</span><span class="s1">?s=</span><span class="si">%s</span><span class="s1">&amp;t=</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">event_id</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">session_index</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">start_time</span><span class="p">))</span>
-            <span class="n">texts_info</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-            <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="n">index</span><span class="p">,</span>
-            <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">session_datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span>
-            <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">transcript</span><span class="p">,</span>
-            <span class="s1">&#39;chunk_id&#39;</span><span class="p">:</span> <span class="n">row</span><span class="o">.</span><span class="n">chunk_id</span><span class="p">,</span>
-            <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">link</span><span class="p">,</span>
-            <span class="p">})</span>
+        <span class="c1"># Update dataset / train and update</span>
+        <span class="n">next_20_best_samples</span> <span class="o">=</span> <span class="n">update_dataset</span><span class="p">(</span><span class="n">POSITIVES</span><span class="p">,</span> <span class="n">NEGATIVES</span><span class="p">,</span> <span class="n">DATASET</span><span class="p">)[:</span><span class="mi">20</span><span class="p">]</span>
+        <span class="n">text_infos</span> <span class="o">=</span> <span class="n">_create_text_infos</span><span class="p">(</span><span class="n">next_20_best_samples</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">texts_info</span>
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;train.html&quot;</span><span class="p">,</span> <span class="n">texts_info</span><span class="o">=</span><span class="n">text_infos</span><span class="p">)</span></div>
 
 
-    <span class="c1"># random_row_from_dataset = DATASET.sample(1).iloc[0]</span>
-    <span class="c1"># with FS.open(random_row_from_dataset.chunk_storage_path, &quot;r&quot;) as open_f:</span>
-    <span class="c1">#     example_random_text = open_f</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RENDERING TEMPLATe&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span>
-        <span class="s2">&quot;train.html&quot;</span><span class="p">,</span>
-        <span class="c1"># example_random_text=example_random_text,</span>
-        <span class="c1"># example_random_text_path=random_row_from_dataset.chunk_storage_path,</span>
-        <span class="c1"># example_random_text_session=random_row_from_dataset.session_datetime,</span>
-        <span class="n">texts_info</span><span class="o">=</span><span class="n">texts_info</span>
-    <span class="p">)</span></div>
+<div class="viewcode-block" id="results"><a class="viewcode-back" href="../../../semantic_navigator.app.html#semantic_navigator.app.views.results">[docs]</a><span class="nd">@views</span><span class="o">.</span><span class="n">route</span><span class="p">(</span><span class="s2">&quot;/results&quot;</span><span class="p">,</span> <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">results</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="c1"># Train final model and get proba dataset</span>
+    <span class="n">top_50_similar</span> <span class="o">=</span> <span class="n">get_final_dataset</span><span class="p">(</span><span class="n">POSITIVES</span><span class="p">,</span> <span class="n">NEGATIVES</span><span class="p">,</span> <span class="n">DATASET</span><span class="p">)[:</span><span class="mi">50</span><span class="p">]</span>
+    <span class="n">text_infos</span> <span class="o">=</span> <span class="n">_create_text_infos</span><span class="p">(</span><span class="n">top_50_similar</span><span class="p">,</span> <span class="n">with_proba</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s2">&quot;results.html&quot;</span><span class="p">,</span> <span class="n">texts_info</span><span class="o">=</span><span class="n">text_infos</span><span class="p">)</span></div>
 </pre></div>
         </article>
       </div>
