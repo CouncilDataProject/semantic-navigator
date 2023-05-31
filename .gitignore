@@ -119,3 +119,6 @@ sem-nav-cdp-sea-small-processed-chunks/
 # Keys
 .keys/
 dataset.parquet
+
+# Random generated files
+docs.code-workspace
