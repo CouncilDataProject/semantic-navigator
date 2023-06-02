@@ -154,8 +154,10 @@ ignore = [
   ".cookiecutter.yaml",
   "*docs/**",
   "*notebooks/*",
-  "*infra/*",
-  "active-learning-example.ipynb",
+  ".dockerignore",
+  ".gcloudignore",
+  "cors.json",
+  "Dockerfile",
 ]
 
 [tool.mypy]
