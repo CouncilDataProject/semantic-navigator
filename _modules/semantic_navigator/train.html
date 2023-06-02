@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
-        <title>semantic_navigator.train - semantic-navigator 0.1.dev1+g93dc655 documentation</title>
+        <title>semantic_navigator.train - semantic-navigator 0.1.dev1+gfcec572 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?digest=e6660623a769aa55fea372102b9bf3151b292993" />
     <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
@@ -123,7 +123,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">semantic-navigator 0.1.dev1+g93dc655 documentation</div></a>
+      <a href="../../index.html"><div class="brand">semantic-navigator 0.1.dev1+gfcec572 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -146,7 +146,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+g93dc655 documentation</span>
+  <span class="sidebar-brand-text">semantic-navigator 0.1.dev1+gfcec572 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -243,9 +243,10 @@
     <span class="p">)</span>
 
     <span class="c1"># using the stored chunk ids, pull the negative embeddings</span>
-    <span class="n">negative_embeddings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">chunk_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">negatives</span><span class="p">)]</span><span class="o">.</span><span class="n">embedding</span>
-    <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">negative_embeddings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">chunk_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">negatives</span><span class="p">)]</span><span class="o">.</span><span class="n">embedding</span>
+        <span class="p">)</span>
 
     <span class="c1"># randomly draw embeddings to be additional negative examples</span>
     <span class="n">random_embeddings_for_negative</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
@@ -254,7 +255,7 @@
 
     <span class="c1"># technically the user could have not given any negative examples</span>
     <span class="c1"># so safety check, &quot;should these embeddings be combined or not&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">negative_embeddings</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">negatives</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">complete_negative_embeddings</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
             <span class="p">[</span><span class="n">negative_embeddings</span><span class="p">,</span> <span class="n">random_embeddings_for_negative</span><span class="p">],</span>
             <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -303,9 +304,15 @@
     <span class="c1"># removing previous annotated examples from the dataset</span>
     <span class="n">new_samples</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
         <span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">chunk_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">positives</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
-        <span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">chunk_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">negatives</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
     <span class="p">)</span>
+
+    <span class="c1"># TODO: bad hacky fix</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">new_samples</span> <span class="o">=</span> <span class="n">new_samples</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">chunk_id</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">negatives</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">pass</span>
 
     <span class="c1"># generate probabilities to use for next annotation cycle</span>
     <span class="n">predictions</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">new_samples</span><span class="o">.</span><span class="n">embedding</span><span class="p">))</span>
