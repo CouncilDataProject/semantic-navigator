@@ -39,9 +39,10 @@ def _basic_model_train(
     )
 
     # using the stored chunk ids, pull the negative embeddings
-    negative_embeddings = np.stack(
-        dataset.loc[dataset.chunk_id.isin(negatives)].embedding
-    )
+    if len(negatives) > 0:
+        negative_embeddings = np.stack(
+            dataset.loc[dataset.chunk_id.isin(negatives)].embedding
+        )
 
     # randomly draw embeddings to be additional negative examples
     random_embeddings_for_negative = np.stack(
@@ -50,7 +51,7 @@ def _basic_model_train(
 
     # technically the user could have not given any negative examples
     # so safety check, "should these embeddings be combined or not"
-    if len(negative_embeddings) > 0:
+    if len(negatives) > 0:
         complete_negative_embeddings = np.concatenate(
             [negative_embeddings, random_embeddings_for_negative],
             axis=0,
@@ -99,9 +100,15 @@ def update_dataset(
     # removing previous annotated examples from the dataset
     new_samples = dataset.drop(
         dataset.loc[dataset.chunk_id.isin(positives)].index,
-    ).drop(
-        dataset.loc[dataset.chunk_id.isin(negatives)].index,
     )
+
+    # TODO: bad hacky fix
+    try:
+        new_samples = new_samples.drop(
+            dataset.loc[dataset.chunk_id.isin(negatives)].index,
+        )
+    except KeyError:
+        pass
 
     # generate probabilities to use for next annotation cycle
     predictions = clf.predict_proba(np.stack(new_samples.embedding))
