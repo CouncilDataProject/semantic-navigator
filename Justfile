@@ -22,7 +22,7 @@ clean:
 
 # install with all deps
 install:
-	pip install -e '.[lint,test,docs,dev]'
+	uv pip install -e '.[lint,test,docs,dev]'
 
 # lint, format, and check all files
 lint:
@@ -84,7 +84,7 @@ USER := env_var("USER")
 default_region := "us-central1"
 default_key_dir := ".keys/"
 default_key := ".keys/sem-nav-dev.json"
-default_project := "sem-nav-eva-005"
+default_project := "sem-nav-eva-006"
 
 # run gcloud login
 login:

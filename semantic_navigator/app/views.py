@@ -23,8 +23,8 @@ log = logging.getLogger(__name__)
 # Globals
 
 # Store the current dataset version
-GCP_PROJECT_ID = "sem-nav-eva-005"
-DATASET_VERSION = "2023-05-02"
+GCP_PROJECT_ID = "sem-nav-eva-006"
+DATASET_VERSION = "2026-01-22"
 
 # Create a GCS File system with anon creds
 FS = GCSFileSystem(GCP_PROJECT_ID, token="anon")
